@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深蓝潜水 - 页面展示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        .header p {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-bottom: 0;
+        }
+
+        .page-showcase {
+            display: grid;
+            grid-template-columns: repeat(3, 375px);
+            grid-template-rows: repeat(3, 812px);
+            gap: 20px;
+            padding: 20px;
+            justify-content: center;
+            align-content: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            overflow: auto;
+        }
+
+        .page-group {
+            text-align: center;
+        }
+
+        .page-title {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .page-container {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            width: 375px;
+            height: 812px;
+        }
+
+        .page-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .page-card:active {
+            transform: translateY(-2px);
+            transition: all 0.1s ease;
+        }
+
+        .page-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .page-card:hover::before {
+            opacity: 1;
+        }
+
+        .click-hint {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 123, 255, 0.1);
+            color: #007AFF;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .page-card:hover .click-hint {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+
+        .page-iframe {
+            width: 375px;
+            height: 812px;
+            border: none;
+            background: white;
+            display: block;
+            transform: scale(1);
+            transform-origin: top left;
+        }
+
+        /* 页面导航样式 */
+        .page-navigation {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .nav-title {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .nav-text {
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .page-info {
+            text-align: center;
+        }
+
+        .page-title {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #333;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 4px 8px;
+            z-index: 10;
+        }
+
+        .page-description {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            opacity: 0.8;
+            margin-top: 40px;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 450px;
+            height: 95vh;
+            max-height: 900px;
+            background: #1a1a1a;
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .modal-phone {
+            width: 393px;
+            height: 852px;
+            background: #1a1a1a;
+            border-radius: 40px;
+            padding: 8px;
+            position: relative;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .modal-notch {
+            width: 126px;
+            height: 30px;
+            background: black;
+            border-radius: 0 0 20px 20px;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        .modal-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 35px;
+            background: white;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .page-title-modal {
+            position: absolute;
+            top: -50px;
+            left: 0;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .page-showcase {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .modal-content {
+                width: 95%;
+                height: 85vh;
+            }
+
+            .nav-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            }
+
+            .nav-item {
+                padding: 15px 10px;
+            }
+        }
+
+        /* 特殊样式为不同页面 */
+        .page-card[data-page="home"] .mini-header {
+            background: linear-gradient(135deg, #007AFF, #0051D5);
+        }
+        
+        .page-card[data-page="buddy"] .mini-header {
+            background: linear-gradient(135deg, #FF6B6B, #FF5252);
+        }
+        
+        .page-card[data-page="spots"] .mini-header {
+            background: linear-gradient(135deg, #4ECDC4, #26A69A);
+        }
+        
+        .page-card[data-page="knowledge"] .mini-header {
+            background: linear-gradient(135deg, #FFD93D, #FF9800);
+        }
+        
+        .page-card[data-page="equipment"] .mini-header {
+            background: linear-gradient(135deg, #9C27B0, #673AB7);
+        }
+        
+        .page-card[data-page="profile"] .mini-header {
+            background: linear-gradient(135deg, #795548, #5D4037);
+        }
+        
+        .page-card[data-page="log"] .mini-header {
+            background: linear-gradient(135deg, #607D8B, #455A64);
+        }
+        
+        .page-card[data-page="charity"] .mini-header {
+            background: linear-gradient(135deg, #8BC34A, #689F38);
+        }
+        
+        .page-card[data-page="certification"] .mini-header {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>深蓝潜水 App</h1>
+            <p>高保真原型页面展示</p>
+        </div>
+
+        <div class="page-showcase">
+            <div class="page-container" onclick="openModal('home_page.html')">
+                <div class="page-title">首页</div>
+                <iframe src="home_page.html" class="page-iframe" sandbox="allow-same-origin allow-scripts"></iframe>
+            </div>
+
+            <div class="page-container" onclick="openModal('dive_buddy.html')">
+                <div class="page-title">潜伴</div>
+                <iframe src="dive_buddy.html" class="page-iframe" sandbox="allow-same-origin allow-scripts"></iframe>
+            </div>
+
+            <div class="page-container" onclick="openModal('dive_spots.html')">
+                <div class="page-title">地图</div>
+                <iframe src="dive_spots.html" class="page-iframe" sandbox="allow-same-origin allow-scripts"></iframe>
+            </div>
+
+            <div class="page-container" onclick="openModal('profile.html')">
+                <div class="page-title">个人中心</div>
+                <iframe src="profile.html" class="page-iframe" sandbox="allow-same-origin allow-scripts"></iframe>
+            </div>
+
+            <div class="page-container" onclick="openModal('equipment.html')">
+                <div class="page-title">装备管理</div>
+                <iframe src="equipment.html" class="page-iframe" sandbox="allow-same-origin allow-scripts"></iframe>
+            </div>
+
+            <div class="page-container" onclick="openModal('dive_log.html')">
+                <div class="page-title">潜水日志</div>
+                <iframe src="dive_log.html" class="page-iframe" sandbox="allow-same-origin allow-scripts"></iframe>
+            </div>
+
+            <div class="page-container" onclick="openModal('certification.html')">
+                <div class="page-title">证书管理</div>
+                <iframe src="certification.html" class="page-iframe" sandbox="allow-same-origin allow-scripts"></iframe>
+            </div>
+
+            <div class="page-container" onclick="openModal('knowledge.html')">
+                <div class="page-title">潜水知识</div>
+                <iframe src="knowledge.html" class="page-iframe" sandbox="allow-same-origin allow-scripts"></iframe>
+            </div>
+
+            <div class="page-container" onclick="openModal('ocean_charity.html')">
+                <div class="page-title">海洋公益</div>
+                <iframe src="ocean_charity.html" class="page-iframe" sandbox="allow-same-origin allow-scripts"></iframe>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- 模态框 -->
+    <div id="pageModal" class="modal">
+        <div class="modal-content">
+            <div class="page-title-modal" id="modalTitle">页面标题</div>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div class="modal-phone">
+                <div class="modal-notch"></div>
+                <iframe id="modalIframe" class="modal-iframe" src="" sandbox="allow-same-origin allow-scripts"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面映射
+        const pageMapping = {
+            'home': { file: 'home_page.html', title: '首页' },
+            'dive-buddy': { file: 'dive_buddy.html', title: '约潜伴' },
+            'spots': { file: 'dive_spots.html', title: '潜水点' },
+            'knowledge': { file: 'knowledge.html', title: '知识库' },
+            'equipment': { file: 'equipment.html', title: '装备推荐' },
+            'profile': { file: 'profile.html', title: '个人中心' },
+            'log': { file: 'dive_log.html', title: '潜水日志' },
+            'charity': { file: 'ocean_charity.html', title: '海洋公益' },
+            'certification': { file: 'certification.html', title: '认证考试' }
+        };
+
+        // 打开模态框
+        function openModal(pageType) {
+            // 检查是否在iframe中，防止嵌套模态框
+            if (window.self !== window.top) {
+                // 如果在iframe中，通知父窗口打开模态框
+                window.parent.postMessage({
+                    type: 'openModal',
+                    pageType: pageType
+                }, '*');
+                return;
+            }
+            
+            const pageInfo = pageMapping[pageType];
+            if (pageInfo) {
+                document.getElementById('modalTitle').textContent = pageInfo.title;
+                document.getElementById('modalIframe').src = pageInfo.file;
+                document.getElementById('pageModal').style.display = 'block';
+                document.body.style.overflow = 'hidden'; // 防止背景滚动
+            }
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('pageModal').style.display = 'none';
+            document.getElementById('modalIframe').src = ''; // 清空iframe
+            document.body.style.overflow = 'auto'; // 恢复滚动
+        }
+
+        // 添加页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            // 页面容器动画
+            const pageContainers = document.querySelectorAll('.page-container');
+            pageContainers.forEach((container, index) => {
+                container.style.opacity = '0';
+                container.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    container.style.transition = 'all 0.8s ease';
+                    container.style.opacity = '1';
+                    container.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+
+        // 添加页面容器的点击事件
+        document.querySelectorAll('.page-container').forEach(container => {
+            container.addEventListener('click', function() {
+                const pageType = this.getAttribute('data-page');
+                openModal(pageType);
+            });
+        });
+
+        // 点击模态框背景关闭
+        document.getElementById('pageModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // ESC键关闭模态框
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // 处理来自iframe的消息
+        window.addEventListener('message', function(e) {
+            if (e.data && e.data.type === 'openModal') {
+                // 从iframe接收到打开模态框的请求
+                openModal(e.data.pageType);
+            }
+        });
+    </script>
+</body>
+</html>

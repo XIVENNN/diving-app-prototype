@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识库 - 潜水小程序</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            background: #f8f9fa;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 44px 20px 20px;
+            color: white;
+            position: relative;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .back-btn {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .bookmark-btn {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 10px 16px;
+            color: white;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .search-bar::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 分类标签 */
+        .category-tabs {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+        }
+
+        .category-tab {
+            padding: 8px 16px;
+            background: #f1f3f4;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            white-space: nowrap;
+        }
+
+        .category-tab.active {
+            background: #333;
+            color: white;
+        }
+
+        /* 推荐学习路径 */
+        .learning-path {
+            background: white;
+            margin: 10px 20px;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .learning-path-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .learning-steps {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .learning-step {
+            min-width: 120px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            color: #666;
+        }
+
+        .learning-step:hover {
+            transform: translateY(-2px);
+        }
+
+        .learning-step.completed {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .learning-step.current {
+            background: #333;
+            color: white;
+            border: 2px solid #666;
+        }
+
+        .step-number {
+            width: 24px;
+            height: 24px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 0 auto 8px;
+        }
+
+        .learning-step.completed .step-number {
+            background: #4caf50;
+        }
+
+        .learning-step.current .step-number {
+            background: #ff9800;
+        }
+
+        .step-title {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .step-desc {
+            font-size: 10px;
+            color: #666;
+        }
+
+        /* 知识文章列表 */
+        .knowledge-list {
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        .knowledge-card {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .knowledge-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .knowledge-image {
+            height: 120px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+        }
+
+        .knowledge-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .knowledge-duration {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+        }
+
+        .knowledge-content {
+            padding: 16px;
+        }
+
+        .knowledge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .knowledge-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .knowledge-bookmark {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            color: #ccc;
+            transition: all 0.3s ease;
+        }
+
+        .knowledge-bookmark.active {
+            color: #ff9800;
+        }
+
+        .knowledge-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .knowledge-tags {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .knowledge-tag {
+            background: #f0f8ff;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .knowledge-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .knowledge-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .knowledge-progress {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            width: 60px;
+            height: 4px;
+            background: #eee;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* 专题卡片 */
+        .topic-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .topic-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+
+        .topic-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .topic-desc {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+
+        .topic-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 20px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #999;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #2a5298;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            background: currentColor;
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .knowledge-card, .topic-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .knowledge-card:nth-child(2) { animation-delay: 0.1s; }
+        .knowledge-card:nth-child(3) { animation-delay: 0.2s; }
+        .knowledge-card:nth-child(4) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航 -->
+        <div class="header">
+            <div class="header-content">
+                <svg class="back-btn" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+                <div class="header-title">知识库</div>
+                <svg class="bookmark-btn" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+                </svg>
+            </div>
+            <input type="text" class="search-bar" placeholder="搜索潜水知识...">
+        </div>
+
+        <!-- 分类标签 -->
+        <div class="category-tabs">
+            <button class="category-tab active">全部</button>
+            <button class="category-tab">基础知识</button>
+            <button class="category-tab">安全技能</button>
+            <button class="category-tab">装备使用</button>
+            <button class="category-tab">海洋生物</button>
+            <button class="category-tab">潜水技巧</button>
+        </div>
+
+        <!-- 学习路径 -->
+        <div class="learning-path">
+            <div class="learning-path-title">
+                🎯 新手学习路径
+            </div>
+            <div class="learning-steps">
+                <div class="learning-step completed">
+                    <div class="step-number">✓</div>
+                    <div class="step-title">潜水基础</div>
+                    <div class="step-desc">了解潜水原理</div>
+                </div>
+                <div class="learning-step completed">
+                    <div class="step-number">✓</div>
+                    <div class="step-title">装备认识</div>
+                    <div class="step-desc">熟悉潜水装备</div>
+                </div>
+                <div class="learning-step current">
+                    <div class="step-number">3</div>
+                    <div class="step-title">安全技能</div>
+                    <div class="step-desc">掌握安全技巧</div>
+                </div>
+                <div class="learning-step">
+                    <div class="step-number">4</div>
+                    <div class="step-title">实践应用</div>
+                    <div class="step-desc">实际潜水练习</div>
+                </div>
+                <div class="learning-step">
+                    <div class="step-number">5</div>
+                    <div class="step-title">进阶技能</div>
+                    <div class="step-desc">高级潜水技能</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 知识文章列表 -->
+        <div class="knowledge-list">
+            <!-- 专题卡片 -->
+            <div class="topic-card">
+                <div class="topic-title">🌊 海洋保护专题</div>
+                <div class="topic-desc">学习如何在潜水中保护海洋环境，做一个负责任的潜水员</div>
+                <div class="topic-stats">
+                    <span>12篇文章</span>
+                    <span>3.2万阅读</span>
+                    <span>4.8评分</span>
+                </div>
+            </div>
+
+            <div class="knowledge-card">
+                <div class="knowledge-image">
+                    <div class="knowledge-badge">必读</div>
+                    <div class="knowledge-duration">5分钟</div>
+    ◈
+                </div>
+                <div class="knowledge-content">
+                    <div class="knowledge-header">
+                        <div class="knowledge-title">潜水安全：如何正确使用面镜</div>
+                        <div class="knowledge-bookmark">◈</div>
+                    </div>
+                    <div class="knowledge-desc">详细介绍面镜的选择、佩戴和使用技巧，以及常见问题的解决方法。</div>
+                    <div class="knowledge-tags">
+                        <div class="knowledge-tag">安全技能</div>
+                        <div class="knowledge-tag">装备使用</div>
+                        <div class="knowledge-tag">新手必读</div>
+                    </div>
+                    <div class="knowledge-footer">
+                        <div class="knowledge-meta">
+                            <span>◉ 1.2万</span>
+                            <span>◈ 856</span>
+                            <span>◉ 23</span>
+                        </div>
+                        <div class="knowledge-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-text">未开始</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="knowledge-card">
+                <div class="knowledge-image">
+                    <div class="knowledge-badge">热门</div>
+                    <div class="knowledge-duration">8分钟</div>
+◈
+                </div>
+                <div class="knowledge-content">
+                    <div class="knowledge-header">
+                        <div class="knowledge-title">认识热带海洋鱼类</div>
+                        <div class="knowledge-bookmark active">◈</div>
+                    </div>
+                    <div class="knowledge-desc">介绍常见的热带海洋鱼类，帮助潜水员在水下更好地观察和识别海洋生物。</div>
+                    <div class="knowledge-tags">
+                        <div class="knowledge-tag">海洋生物</div>
+                        <div class="knowledge-tag">观察技巧</div>
+                        <div class="knowledge-tag">科普知识</div>
+                    </div>
+                    <div class="knowledge-footer">
+                        <div class="knowledge-meta">
+                            <span>◉ 8.5千</span>
+                            <span>◈ 642</span>
+                            <span>◉ 18</span>
+                        </div>
+                        <div class="knowledge-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 60%"></div>
+                            </div>
+                            <div class="progress-text">60%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="knowledge-card">
+                <div class="knowledge-image">
+                    <div class="knowledge-badge">进阶</div>
+                    <div class="knowledge-duration">12分钟</div>
+        ◈
+                </div>
+                <div class="knowledge-content">
+                    <div class="knowledge-header">
+                        <div class="knowledge-title">深潜安全与减压理论</div>
+                        <div class="knowledge-bookmark">🔖</div>
+                    </div>
+                    <div class="knowledge-desc">深入了解深潜的风险和安全措施，掌握减压理论和实际应用。</div>
+                    <div class="knowledge-tags">
+                        <div class="knowledge-tag">深潜技能</div>
+                        <div class="knowledge-tag">安全知识</div>
+                        <div class="knowledge-tag">理论学习</div>
+                    </div>
+                    <div class="knowledge-footer">
+                        <div class="knowledge-meta">
+                            <span>◉ 5.2千</span>
+                            <span>◈ 398</span>
+                            <span>◉ 31</span>
+                        </div>
+                        <div class="knowledge-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                            <div class="progress-text">已完成</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="knowledge-card">
+                <div class="knowledge-image">
+                    <div class="knowledge-badge">实用</div>
+                    <div class="knowledge-duration">6分钟</div>
+◈
+                </div>
+                <div class="knowledge-content">
+                    <div class="knowledge-header">
+                        <div class="knowledge-title">水下摄影入门技巧</div>
+                        <div class="knowledge-bookmark">🔖</div>
+                    </div>
+                    <div class="knowledge-desc">学习水下摄影的基本技巧，拍出令人惊艳的海底世界照片。</div>
+                    <div class="knowledge-tags">
+                        <div class="knowledge-tag">摄影技巧</div>
+                        <div class="knowledge-tag">创意拍摄</div>
+                        <div class="knowledge-tag">技能提升</div>
+                    </div>
+                    <div class="knowledge-footer">
+                        <div class="knowledge-meta">
+                            <span>◉ 6.8千</span>
+                            <span>◈ 521</span>
+                            <span>◉ 15</span>
+                        </div>
+                        <div class="knowledge-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 30%"></div>
+                            </div>
+                            <div class="progress-text">30%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="knowledge-card">
+                <div class="knowledge-image">
+                    <div class="knowledge-badge">环保</div>
+                    <div class="knowledge-duration">10分钟</div>
+◈
+                </div>
+                <div class="knowledge-content">
+                    <div class="knowledge-header">
+                        <div class="knowledge-title">珊瑚礁保护与修复</div>
+                        <div class="knowledge-bookmark">🔖</div>
+                    </div>
+                    <div class="knowledge-desc">了解珊瑚礁的重要性，学习如何在潜水中保护珊瑚礁生态系统。</div>
+                    <div class="knowledge-tags">
+                        <div class="knowledge-tag">环境保护</div>
+                        <div class="knowledge-tag">生态知识</div>
+                        <div class="knowledge-tag">社会责任</div>
+                    </div>
+                    <div class="knowledge-footer">
+                        <div class="knowledge-meta">
+                            <span>◉ 4.1千</span>
+                            <span>◈ 312</span>
+                            <span>◉ 27</span>
+                        </div>
+                        <div class="knowledge-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-text">未开始</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div></section>
+
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+            <a href="home_page.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z%22/></svg>')"></div>
+                <span>首页</span>
+            </a>
+            <a href="dive_buddy.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H16c-.8 0-1.54.37-2 1l-3 4v2h2l2.54-3.4L16.5 18H20z%22/></svg>')"></div>
+                <span>约潜伴</span>
+            </a>
+            <a href="dive_spots.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z%22/></svg>')"></div>
+                <span>潜水点</span>
+            </a>
+            <a href="equipment.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z%22/></svg>')"></div>
+                <span>装备</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z%22/></svg>')"></div>
+                <span>我的</span>
+            </a>
+            </div>
+    </div>
+
+    <script>
+        // 分类标签切换
+        document.querySelectorAll('.category-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 学习步骤点击
+        document.querySelectorAll('.learning-step').forEach(step => {
+            step.addEventListener('click', function() {
+                // 这里可以跳转到对应的学习内容
+                console.log('开始学习步骤');
+            });
+        });
+
+        // 收藏按钮
+        document.querySelectorAll('.knowledge-bookmark').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                this.classList.toggle('active');
+            });
+        });
+
+        // 知识卡片点击
+        document.querySelectorAll('.knowledge-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // 这里可以跳转到文章详情页
+                console.log('查看知识文章');
+            });
+        });
+
+        // 专题卡片点击
+        document.querySelectorAll('.topic-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // 这里可以跳转到专题页面
+                console.log('查看专题内容');
+            });
+        });
+
+        // 搜索功能
+        document.querySelector('.search-bar').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            // 这里可以实现搜索过滤功能
+            console.log('搜索知识:', searchTerm);
+        });
+
+        // 书签按钮
+        document.querySelector('.bookmark-btn').addEventListener('click', function() {
+            // 这里可以跳转到收藏页面
+            console.log('查看收藏的文章');
+        });
+
+        // 返回按钮
+        document.querySelector('.back-btn').addEventListener('click', function() {
+            window.history.back();
+        });
+    </script>
+</body>
+</html>

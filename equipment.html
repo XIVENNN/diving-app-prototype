@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>装备推荐 - 潜水小程序</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 375px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 80px;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 44px 20px 20px;
+            color: white;
+            position: relative;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .back-btn {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .cart-btn {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 10px 16px;
+            color: white;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .search-bar::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 分类导航 */
+        .category-nav {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+        }
+
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-icon {
+            width: 40px;
+            height: 40px;
+            background: #f5f5f5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 6px;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .category-item.active .category-icon {
+            background: #333;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .category-name {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+
+        .category-item.active .category-name {
+            color: #ff4757;
+            font-weight: 600;
+        }
+
+        /* 推荐配置 */
+        .recommendation-section {
+            background: white;
+            margin: 10px 20px;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .recommendation-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .recommendation-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .recommendation-tab {
+            padding: 6px 12px;
+            background: #f1f3f4;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .recommendation-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .recommendation-card {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .recommendation-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .recommendation-info {
+            flex: 1;
+        }
+
+        .recommendation-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .recommendation-desc {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .recommendation-price {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ff4757;
+        }
+
+        /* 装备列表 */
+        .equipment-list {
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        .equipment-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .equipment-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .equipment-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .equipment-image {
+            height: 120px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+        }
+
+        .equipment-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .equipment-favorite {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .equipment-favorite.active {
+            background: #ff4757;
+            color: white;
+        }
+
+        .equipment-content {
+            padding: 12px;
+        }
+
+        .equipment-brand {
+            font-size: 10px;
+            color: #999;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .equipment-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #333;
+            line-height: 1.2;
+        }
+
+        .equipment-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .equipment-stars {
+            color: #ffc107;
+            font-size: 12px;
+        }
+
+        .equipment-score {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .equipment-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .equipment-current-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ff4757;
+        }
+
+        .equipment-original-price {
+            font-size: 12px;
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .equipment-add {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .equipment-add:hover {
+            transform: scale(1.1);
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 375px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 20px;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #000;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            background: currentColor;
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .equipment-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .equipment-card:nth-child(2n) { animation-delay: 0.1s; }
+        .equipment-card:nth-child(3n) { animation-delay: 0.2s; }
+        .equipment-card:nth-child(4n) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航 -->
+        <div class="header">
+            <div class="header-content">
+                <svg class="back-btn" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+                <div class="header-title">装备推荐</div>
+                <div class="cart-btn">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                    </svg>
+                    <div class="cart-badge">3</div>
+                </div>
+            </div>
+            <input type="text" class="search-bar" placeholder="搜索装备品牌、型号...">
+        </div>
+
+        <!-- 分类导航 -->
+        <div class="category-nav">
+            <div class="category-item active">
+                <div class="category-icon">◈</div>
+                <div class="category-name">面镜</div>
+            </div>
+            <div class="category-item">
+                <div class="category-icon">🏊</div>
+                <div class="category-name">呼吸管</div>
+            </div>
+            <div class="category-item">
+                <div class="category-icon">🦶</div>
+                <div class="category-name">脚蹼</div>
+            </div>
+            <div class="category-item">
+                <div class="category-icon">🧥</div>
+                <div class="category-name">潜水服</div>
+            </div>
+            <div class="category-item">
+                <div class="category-icon">🎒</div>
+                <div class="category-name">BCD</div>
+            </div>
+            <div class="category-item">
+                <div class="category-icon">⚙</div>
+                <div class="category-name">调节器</div>
+            </div>
+        </div>
+
+        <!-- 推荐配置 -->
+        <div class="recommendation-section">
+            <div class="recommendation-title">💡 新手推荐配置</div>
+            <div class="recommendation-tabs">
+                <button class="recommendation-tab active">入门套装</button>
+                <button class="recommendation-tab">进阶套装</button>
+                <button class="recommendation-tab">专业套装</button>
+            </div>
+            <div class="recommendation-card">
+                <div class="recommendation-icon">📦</div>
+                <div class="recommendation-info">
+                    <div class="recommendation-name">OW新手三宝套装</div>
+                    <div class="recommendation-desc">面镜+呼吸管+脚蹼，适合初学者</div>
+                </div>
+                <div class="recommendation-price">¥299</div>
+            </div>
+        </div>
+
+        <!-- 装备列表 -->
+        <div class="equipment-list">
+            <div class="equipment-grid">
+                <div class="equipment-card">
+                    <div class="equipment-image">
+                        <div class="equipment-badge">热销</div>
+                        <div class="equipment-favorite">♡</div>
+        ◈
+                    </div>
+                    <div class="equipment-content">
+                        <div class="equipment-brand">SCUBAPRO</div>
+                        <div class="equipment-name">Synergy 2 Twin面镜</div>
+                        <div class="equipment-rating">
+                            <div class="equipment-stars">★★★★★</div>
+                            <div class="equipment-score">4.8</div>
+                        </div>
+                        <div class="equipment-price">
+                            <div>
+                                <div class="equipment-current-price">¥458</div>
+                                <div class="equipment-original-price">¥598</div>
+                            </div>
+                            <button class="equipment-add">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="equipment-card">
+                    <div class="equipment-image">
+                        <div class="equipment-badge">推荐</div>
+                        <div class="equipment-favorite">♡</div>
+                        🏊
+                    </div>
+                    <div class="equipment-content">
+                        <div class="equipment-brand">MARES</div>
+                        <div class="equipment-name">Ergo Dry呼吸管</div>
+                        <div class="equipment-rating">
+                            <div class="equipment-stars">★★★★☆</div>
+                            <div class="equipment-score">4.6</div>
+                        </div>
+                        <div class="equipment-price">
+                            <div>
+                                <div class="equipment-current-price">¥128</div>
+                                <div class="equipment-original-price">¥168</div>
+                            </div>
+                            <button class="equipment-add">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="equipment-card">
+                    <div class="equipment-image">
+                        <div class="equipment-badge">新品</div>
+                        <div class="equipment-favorite active">♥</div>
+                        🦶
+                    </div>
+                    <div class="equipment-content">
+                        <div class="equipment-brand">CRESSI</div>
+                        <div class="equipment-name">Palau SAF脚蹼</div>
+                        <div class="equipment-rating">
+                            <div class="equipment-stars">★★★★★</div>
+                            <div class="equipment-score">4.9</div>
+                        </div>
+                        <div class="equipment-price">
+                            <div>
+                                <div class="equipment-current-price">¥298</div>
+                                <div class="equipment-original-price">¥358</div>
+                            </div>
+                            <button class="equipment-add">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="equipment-card">
+                    <div class="equipment-image">
+                        <div class="equipment-badge">特价</div>
+                        <div class="equipment-favorite">♡</div>
+                        🧥
+                    </div>
+                    <div class="equipment-content">
+                        <div class="equipment-brand">AQUALUNG</div>
+                        <div class="equipment-name">3mm潜水服</div>
+                        <div class="equipment-rating">
+                            <div class="equipment-stars">★★★★☆</div>
+                            <div class="equipment-score">4.5</div>
+                        </div>
+                        <div class="equipment-price">
+                            <div>
+                                <div class="equipment-current-price">¥688</div>
+                                <div class="equipment-original-price">¥888</div>
+                            </div>
+                            <button class="equipment-add">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="equipment-card">
+                    <div class="equipment-image">
+                        <div class="equipment-badge">专业</div>
+                        <div class="equipment-favorite">♡</div>
+                        🎒
+                    </div>
+                    <div class="equipment-content">
+                        <div class="equipment-brand">SCUBAPRO</div>
+                        <div class="equipment-name">Hydros Pro BCD</div>
+                        <div class="equipment-rating">
+                            <div class="equipment-stars">★★★★★</div>
+                            <div class="equipment-score">4.9</div>
+                        </div>
+                        <div class="equipment-price">
+                            <div>
+                                <div class="equipment-current-price">¥2888</div>
+                                <div class="equipment-original-price">¥3288</div>
+                            </div>
+                            <button class="equipment-add">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="equipment-card">
+                    <div class="equipment-image">
+                        <div class="equipment-badge">高端</div>
+                        <div class="equipment-favorite">♡</div>
+        ⚙
+                    </div>
+                    <div class="equipment-content">
+                        <div class="equipment-brand">APEKS</div>
+                        <div class="equipment-name">XTX50调节器</div>
+                        <div class="equipment-rating">
+                            <div class="equipment-stars">★★★★★</div>
+                            <div class="equipment-score">4.8</div>
+                        </div>
+                        <div class="equipment-price">
+                            <div>
+                                <div class="equipment-current-price">¥3588</div>
+                                <div class="equipment-original-price">¥3988</div>
+                            </div>
+                            <button class="equipment-add">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <a href="home_page.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z%22/></svg>')"></div>
+                <span>首页</span>
+            </a>
+            <a href="dive_buddy.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H16c-.8 0-1.54.37-2 1l-3 4v2h2l2.54-3.4L16.5 18H20z%22/></svg>')"></div>
+                <span>约潜伴</span>
+            </a>
+            <a href="dive_spots.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z%22/></svg>')"></div>
+                <span>潜水点</span>
+            </a>
+            <a href="equipment.html" class="nav-item active">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z%22/></svg>')"></div>
+                <span>装备</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z%22/></svg>')"></div>
+                <span>我的</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 分类切换
+        document.querySelectorAll('.category-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 推荐配置标签切换
+        document.querySelectorAll('.recommendation-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.recommendation-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 收藏按钮
+        document.querySelectorAll('.equipment-favorite').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                this.classList.toggle('active');
+                this.textContent = this.classList.contains('active') ? '♥' : '♡';
+            });
+        });
+
+        // 添加到购物车
+        document.querySelectorAll('.equipment-add').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                this.textContent = '✓';
+                this.style.background = '#28a745';
+                
+                // 更新购物车数量
+                const cartBadge = document.querySelector('.cart-badge');
+                const currentCount = parseInt(cartBadge.textContent);
+                cartBadge.textContent = currentCount + 1;
+                
+                setTimeout(() => {
+                    this.textContent = '+';
+                    this.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                }, 1000);
+            });
+        });
+
+        // 装备卡片点击
+        document.querySelectorAll('.equipment-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // 这里可以跳转到装备详情页
+                console.log('查看装备详情');
+            });
+        });
+
+        // 搜索功能
+        document.querySelector('.search-bar').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            // 这里可以实现搜索过滤功能
+            console.log('搜索装备:', searchTerm);
+        });
+
+        // 购物车点击
+        document.querySelector('.cart-btn').addEventListener('click', function() {
+            // 这里可以跳转到购物车页面
+            console.log('查看购物车');
+        });
+
+        // 返回按钮
+        document.querySelector('.back-btn').addEventListener('click', function() {
+            window.history.back();
+        });
+    </script>
+</body>
+</html>

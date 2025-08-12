@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深蓝潜水 App - 高保真作品集</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #007AFF, #0051D5);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .project-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .project-subtitle {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .designer-info {
+            text-align: right;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .intro-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .app-category {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .main-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .description {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .screens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .screen-showcase {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .screen-showcase:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .screen-showcase::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #333;
+        }
+
+        .screen-frame {
+            width: 200px;
+            height: 400px;
+            background: white;
+            border-radius: 12px;
+            margin: 0 auto 20px;
+            padding: 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            border: 1px solid #e0e0e0;
+        }
+
+        .screen-content {
+            padding: 15px 10px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        .status-bar {
+            height: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 8px;
+            color: #333;
+            margin-bottom: 8px;
+            padding: 0 5px;
+        }
+
+        .app-header {
+            height: 45px;
+            background: #333;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 11px;
+        }
+
+        .content-area {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            position: relative;
+            overflow: hidden;
+            padding: 8px;
+        }
+
+        /* 搜索栏样式 */
+        .mini-search {
+            height: 20px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            font-size: 7px;
+            color: #999;
+        }
+
+        /* 横幅样式 */
+        .mini-banner {
+            height: 35px;
+            background: linear-gradient(45deg, #4FACFE 0%, #00F2FE 100%);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 7px;
+            font-weight: 600;
+        }
+
+        /* 功能卡片网格 */
+        .mini-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .mini-card {
+            height: 25px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6px;
+            color: #666;
+            position: relative;
+        }
+
+        .mini-card::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            margin-right: 3px;
+        }
+
+        .mini-card.buddy::before { background: #FF6B6B; }
+        .mini-card.spots::before { background: #4ECDC4; }
+        .mini-card.equipment::before { background: #45B7D1; }
+        .mini-card.knowledge::before { background: #F093FB; }
+
+        /* 内容列表 */
+        .mini-list {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .mini-list-item {
+            height: 18px;
+            background: white;
+            border-radius: 3px;
+            border: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            padding: 0 6px;
+            font-size: 6px;
+            color: #666;
+        }
+
+        .mini-list-item::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ddd;
+            margin-right: 4px;
+        }
+
+        .mini-list-item.highlight::before {
+            background: #007AFF;
+        }
+
+        .bottom-nav {
+            height: 40px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            position: relative;
+        }
+
+        .nav-dot {
+            width: 6px;
+            height: 6px;
+            background: #ccc;
+            border-radius: 50%;
+        }
+
+        .nav-dot.active {
+            background: #007AFF;
+        }
+
+        .screen-info {
+            text-align: center;
+        }
+
+        .screen-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .screen-description {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .features-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .features-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #007AFF, #0051D5);
+            border-radius: 15px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .tech-stack {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .tech-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .tech-tag {
+            background: white;
+            color: #333;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 不同页面的特色样式 */
+        .screen-showcase[data-screen="home"] .app-header {
+            background: linear-gradient(135deg, #007AFF, #0051D5);
+        }
+        
+        .screen-showcase[data-screen="buddy"] .app-header {
+            background: linear-gradient(135deg, #FF6B6B, #FF5252);
+        }
+        
+        .screen-showcase[data-screen="spots"] .app-header {
+            background: linear-gradient(135deg, #4ECDC4, #26A69A);
+        }
+        
+        .screen-showcase[data-screen="knowledge"] .app-header {
+            background: linear-gradient(135deg, #FFD93D, #FF9800);
+        }
+        
+        .screen-showcase[data-screen="equipment"] .app-header {
+            background: linear-gradient(135deg, #9C27B0, #673AB7);
+        }
+        
+        .screen-showcase[data-screen="profile"] .app-header {
+            background: linear-gradient(135deg, #795548, #5D4037);
+        }
+        
+        .screen-showcase[data-screen="log"] .app-header {
+            background: linear-gradient(135deg, #607D8B, #455A64);
+        }
+        
+        .screen-showcase[data-screen="charity"] .app-header {
+            background: linear-gradient(135deg, #8BC34A, #689F38);
+        }
+        
+        .screen-showcase[data-screen="certification"] .app-header {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+        }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .screens-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .screen-frame {
+                width: 160px;
+                height: 320px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🌊</div>
+                <div>
+                    <div class="project-title">深蓝潜水 App</div>
+                    <div class="project-subtitle">高保真移动端原型</div>
+                </div>
+            </div>
+            <div class="designer-info">
+                <div>Design By</div>
+                <div style="font-weight: 600;">UI/UX Designer</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="intro-section">
+            <div class="app-category">APP EXPLORATION</div>
+            <h1 class="main-title">深蓝潜水移动端 App UI</h1>
+            <p class="description">
+                专为潜水爱好者设计的移动应用，提供潜水点探索、伙伴匹配、装备推荐、知识学习等全方位服务，
+                打造完整的潜水生态圈体验。
+            </p>
+        </div>
+
+        <div class="screens-grid">
+            <!-- 首页 -->
+            <div class="screen-showcase" data-screen="home">
+                <div class="screen-frame">
+                    <div class="screen-content">
+                            <div class="status-bar">
+                                <span>9:41</span>
+                                <span>🔋 100%</span>
+                            </div>
+                            <div class="app-header">深蓝潜水</div>
+                            <div class="content-area">
+                                <div class="mini-search">🔍 搜索潜水点、活动...</div>
+                                <div class="mini-banner">探索深海世界</div>
+                                <div class="mini-grid">
+                                    <div class="mini-card buddy">约潜伴</div>
+                                    <div class="mini-card spots">潜水点</div>
+                                    <div class="mini-card equipment">装备</div>
+                                    <div class="mini-card knowledge">知识</div>
+                                </div>
+                                <div class="mini-list">
+                                    <div class="mini-list-item highlight">马尔代夫潜水之旅</div>
+                                    <div class="mini-list-item">巴厘岛PADI课程</div>
+                                    <div class="mini-list-item highlight">装备推荐指南</div>
+                                </div>
+                            </div>
+                            <div class="bottom-nav">
+                                <div class="nav-dot active"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                            </div>
+                    </div>
+                </div>
+                <div class="screen-info">
+                    <h3 class="screen-title">应用首页</h3>
+                    <p class="screen-description">主页面包含搜索功能、快捷入口、推荐内容和底部导航，为用户提供便捷的应用入口。</p>
+                </div>
+            </div>
+
+            <!-- 约潜伴 -->
+            <div class="screen-showcase" data-screen="buddy">
+                <div class="screen-frame">
+                    <div class="screen-content">
+                            <div class="status-bar">
+                                <span>9:41</span>
+                                <span>🔋 100%</span>
+                            </div>
+                            <div class="app-header">约潜伴</div>
+                            <div class="content-area">
+                                <div style="display: flex; gap: 3px; margin-bottom: 8px;">
+                                    <div style="padding: 2px 6px; background: #667eea; color: white; border-radius: 8px; font-size: 6px;">全部</div>
+                                    <div style="padding: 2px 6px; background: #f1f3f4; border-radius: 8px; font-size: 6px;">初级</div>
+                                    <div style="padding: 2px 6px; background: #f1f3f4; border-radius: 8px; font-size: 6px;">高级</div>
+                                </div>
+                                <div class="mini-list">
+                                    <div class="mini-list-item highlight">👤 张三 - 寻找潜伴</div>
+                                    <div class="mini-list-item">👤 李四 - 马代约潜</div>
+                                    <div class="mini-list-item highlight">👤 王五 - PADI课程</div>
+                                    <div class="mini-list-item">👤 赵六 - 装备分享</div>
+                                    <div class="mini-list-item highlight">👤 钱七 - 技术潜水</div>
+                                </div>
+                            </div>
+                            <div class="bottom-nav">
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot active"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-info">
+                    <h3 class="screen-title">约潜伴</h3>
+                    <p class="screen-description">寻找志同道合的潜水伙伴，发布和参与潜水活动，建立潜水社交网络。</p>
+                </div>
+            </div>
+
+            <!-- 潜水点 -->
+            <div class="screen-showcase" data-screen="spots">
+                <div class="screen-frame">
+                    <div class="screen-content">
+                            <div class="status-bar">
+                                <span>9:41</span>
+                                <span>🔋 100%</span>
+                            </div>
+                            <div class="app-header">潜水点</div>
+                            <div class="content-area">
+                                <div style="height: 40px; background: linear-gradient(45deg, #4ECDC4, #44A08D); border-radius: 6px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 7px; font-weight: 600;">🗺️ 全球潜水点地图</div>
+                                <div style="display: flex; gap: 3px; margin-bottom: 8px;">
+                                    <div style="padding: 2px 6px; background: #4ECDC4; color: white; border-radius: 8px; font-size: 6px;">热门</div>
+                                    <div style="padding: 2px 6px; background: #f1f3f4; border-radius: 8px; font-size: 6px;">附近</div>
+                                    <div style="padding: 2px 6px; background: #f1f3f4; border-radius: 8px; font-size: 6px;">收藏</div>
+                                </div>
+                                <div class="mini-list">
+                                    <div class="mini-list-item highlight">🏝️ 马尔代夫 - 5星推荐</div>
+                                    <div class="mini-list-item">🐠 巴厘岛 - 适合初学者</div>
+                                    <div class="mini-list-item highlight">🦈 帕劳 - 鲨鱼潜点</div>
+                                    <div class="mini-list-item">🐢 红海 - 海龟天堂</div>
+                                </div>
+                            </div>
+                            <div class="bottom-nav">
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot active"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-info">
+                    <h3 class="screen-title">潜水点探索</h3>
+                    <p class="screen-description">发现全球优质潜水点，查看详细信息、用户评价和实时条件。</p>
+                </div>
+            </div>
+
+            <!-- 知识库 -->
+            <div class="screen-showcase" data-screen="knowledge">
+                <div class="screen-frame">
+                    <div class="screen-content">
+                            <div class="status-bar">
+                                <span>9:41</span>
+                                <span>🔋 100%</span>
+                            </div>
+                            <div class="app-header">知识库</div>
+                            <div class="content-area">
+                                <div class="mini-grid">
+                                    <div style="height: 20px; background: #FFD93D; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 6px; color: #333;">📚 基础知识</div>
+                                    <div style="height: 20px; background: #FF9800; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 6px; color: white;">🏊 技能训练</div>
+                                    <div style="height: 20px; background: #4CAF50; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 6px; color: white;">⚠️ 安全须知</div>
+                                    <div style="height: 20px; background: #2196F3; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 6px; color: white;">🎓 认证考试</div>
+                                </div>
+                                <div class="mini-list">
+                                    <div class="mini-list-item highlight">📖 潜水基础理论</div>
+                                    <div class="mini-list-item">🤿 装备使用指南</div>
+                                    <div class="mini-list-item highlight">🆘 紧急救援技能</div>
+                                    <div class="mini-list-item">🌊 海洋生物识别</div>
+                                </div>
+                            </div>
+                            <div class="bottom-nav">
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot active"></div>
+                                <div class="nav-dot"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-info">
+                    <h3 class="screen-title">知识学习</h3>
+                    <p class="screen-description">潜水技能学习、安全知识分享，提升潜水技能和安全意识。</p>
+                </div>
+            </div>
+
+            <!-- 装备推荐 -->
+            <div class="screen-showcase" data-screen="equipment">
+                <div class="screen-frame">
+                    <div class="screen-content">
+                            <div class="status-bar">
+                                <span>9:41</span>
+                                <span>🔋 100%</span>
+                            </div>
+                            <div class="app-header">装备推荐</div>
+                            <div class="content-area">
+                                <div style="display: flex; gap: 3px; margin-bottom: 8px;">
+                                    <div style="padding: 2px 6px; background: #9C27B0; color: white; border-radius: 8px; font-size: 6px;">面镜</div>
+                                    <div style="padding: 2px 6px; background: #f1f3f4; border-radius: 8px; font-size: 6px;">呼吸器</div>
+                                    <div style="padding: 2px 6px; background: #f1f3f4; border-radius: 8px; font-size: 6px;">潜水服</div>
+                                </div>
+                                <div class="mini-list">
+                                    <div class="mini-list-item highlight">🥽 SCUBAPRO 面镜</div>
+                                    <div class="mini-list-item">🤿 Mares 呼吸器套装</div>
+                                    <div class="mini-list-item highlight">👕 5mm 潜水服推荐</div>
+                                    <div class="mini-list-item">🦶 潜水靴选购指南</div>
+                                    <div class="mini-list-item highlight">💡 水下手电筒</div>
+                                </div>
+                            </div>
+                            <div class="bottom-nav">
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot active"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-info">
+                    <h3 class="screen-title">装备推荐</h3>
+                    <p class="screen-description">专业潜水装备选购指南，根据用户需求推荐合适的装备。</p>
+                </div>
+            </div>
+
+            <!-- 个人中心 -->
+            <div class="screen-showcase" data-screen="profile">
+                <div class="screen-frame">
+                    <div class="screen-content">
+                            <div class="status-bar">
+                                <span>9:41</span>
+                                <span>🔋 100%</span>
+                            </div>
+                            <div class="app-header">个人中心</div>
+                            <div class="content-area">
+                                <div style="height: 25px; background: white; border-radius: 6px; margin-bottom: 8px; display: flex; align-items: center; padding: 0 8px; border: 1px solid #f0f0f0;">
+                                    <div style="width: 12px; height: 12px; border-radius: 50%; background: #795548; margin-right: 6px;"></div>
+                                    <span style="font-size: 7px; color: #333;">张三 - 高级潜水员</span>
+                                </div>
+                                <div class="mini-list">
+                                    <div class="mini-list-item">📊 我的统计</div>
+                                    <div class="mini-list-item highlight">🏆 我的成就</div>
+                                    <div class="mini-list-item">📝 潜水日志</div>
+                                    <div class="mini-list-item highlight">⚙️ 设置</div>
+                                    <div class="mini-list-item">❓ 帮助中心</div>
+                                </div>
+                            </div>
+                            <div class="bottom-nav">
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot active"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-info">
+                    <h3 class="screen-title">个人中心</h3>
+                    <p class="screen-description">用户个人信息管理、设置配置和个性化定制。</p>
+                </div>
+            </div>
+
+            <!-- 潜水日志 -->
+            <div class="screen-showcase" data-screen="log">
+                <div class="screen-frame">
+                    <div class="screen-content">
+                            <div class="status-bar">
+                                <span>9:41</span>
+                                <span>🔋 100%</span>
+                            </div>
+                            <div class="app-header">潜水日志</div>
+                            <div class="content-area">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <span style="font-size: 7px; color: #666;">总计: 42次潜水</span>
+                                    <div style="padding: 2px 6px; background: #607D8B; color: white; border-radius: 8px; font-size: 6px;">+ 新增</div>
+                                </div>
+                                <div class="mini-list">
+                                    <div class="mini-list-item highlight">📅 2024-01-15 马尔代夫</div>
+                                    <div class="mini-list-item highlight">📅 2024-01-10 巴厘岛</div>
+                                    <div class="mini-list-item">📅 2024-01-05 帕劳</div>
+                                    <div class="mini-list-item highlight">📅 2023-12-28 红海</div>
+                                    <div class="mini-list-item">📅 2023-12-20 菲律宾</div>
+                                </div>
+                            </div>
+                            <div class="bottom-nav">
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot active"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-info">
+                    <h3 class="screen-title">潜水日志</h3>
+                    <p class="screen-description">记录和管理个人潜水经历，追踪潜水成长历程。</p>
+                </div>
+            </div>
+
+            <!-- 海洋公益 -->
+            <div class="screen-showcase" data-screen="charity">
+                <div class="screen-frame">
+                    <div class="screen-content">
+                            <div class="status-bar">
+                                <span>9:41</span>
+                                <span>🔋 100%</span>
+                            </div>
+                            <div class="app-header">海洋公益</div>
+                            <div class="content-area">
+                                <div style="height: 30px; background: linear-gradient(45deg, #8BC34A, #689F38); border-radius: 6px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 7px; font-weight: 600;">🌊 保护海洋，从我做起</div>
+                                <div style="display: flex; gap: 3px; margin-bottom: 8px;">
+                                    <div style="padding: 2px 6px; background: #8BC34A; color: white; border-radius: 8px; font-size: 6px;">活动</div>
+                                    <div style="padding: 2px 6px; background: #f1f3f4; border-radius: 8px; font-size: 6px;">捐赠</div>
+                                    <div style="padding: 2px 6px; background: #f1f3f4; border-radius: 8px; font-size: 6px;">志愿</div>
+                                </div>
+                                <div class="mini-list">
+                                    <div class="mini-list-item highlight">🗑️ 海滩清洁活动</div>
+                                    <div class="mini-list-item">🐢 海龟保护项目</div>
+                                    <div class="mini-list-item highlight">🪸 珊瑚礁修复</div>
+                                    <div class="mini-list-item">📚 环保教育</div>
+                                </div>
+                            </div>
+                            <div class="bottom-nav">
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot active"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-info">
+                    <h3 class="screen-title">海洋公益</h3>
+                    <p class="screen-description">参与海洋保护和环保活动，共同守护海洋生态。</p>
+                </div>
+            </div>
+
+            <!-- 认证考试 -->
+            <div class="screen-showcase" data-screen="certification">
+                <div class="screen-frame">
+                    <div class="screen-content">
+                            <div class="status-bar">
+                                <span>9:41</span>
+                                <span>🔋 100%</span>
+                            </div>
+                            <div class="app-header">认证考试</div>
+                            <div class="content-area">
+                                <div style="display: flex; gap: 3px; margin-bottom: 8px;">
+                                    <div style="padding: 2px 6px; background: #FF9800; color: white; border-radius: 8px; font-size: 6px;">OW</div>
+                                    <div style="padding: 2px 6px; background: #f1f3f4; border-radius: 8px; font-size: 6px;">AOW</div>
+                                    <div style="padding: 2px 6px; background: #f1f3f4; border-radius: 8px; font-size: 6px;">救援</div>
+                                    <div style="padding: 2px 6px; background: #f1f3f4; border-radius: 8px; font-size: 6px;">DM</div>
+                                </div>
+                                <div style="height: 25px; background: white; border-radius: 6px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid #f0f0f0; font-size: 7px; color: #666;">📊 当前进度: 85%</div>
+                                <div class="mini-list">
+                                    <div class="mini-list-item highlight">📋 理论考试 - 已完成</div>
+                                    <div class="mini-list-item">🏊 平静水域 - 进行中</div>
+                                    <div class="mini-list-item highlight">🌊 开放水域 - 待开始</div>
+                                    <div class="mini-list-item">🎓 证书申请 - 待开始</div>
+                                </div>
+                            </div>
+                            <div class="bottom-nav">
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot"></div>
+                                <div class="nav-dot active"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-info">
+                    <h3 class="screen-title">认证考试</h3>
+                    <p class="screen-description">潜水证书考试和认证管理，提升专业技能水平。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-section">
+            <h2 class="features-title">核心功能特色</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🏠</div>
+                    <h3 class="feature-title">智能首页</h3>
+                    <p class="feature-desc">个性化推荐内容，快捷功能入口，提升用户体验</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">👥</div>
+                    <h3 class="feature-title">社交匹配</h3>
+                    <p class="feature-desc">智能匹配潜水伙伴，建立潜水社交网络</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📍</div>
+                    <h3 class="feature-title">地点探索</h3>
+                    <p class="feature-desc">全球潜水点数据库，详细信息和用户评价</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📚</div>
+                    <h3 class="feature-title">知识学习</h3>
+                    <p class="feature-desc">专业潜水知识库，安全技能培训</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🛠️</div>
+                    <h3 class="feature-title">装备指南</h3>
+                    <p class="feature-desc">专业装备推荐，个性化选购建议</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📝</div>
+                    <h3 class="feature-title">日志记录</h3>
+                    <p class="feature-desc">潜水经历记录，成长轨迹追踪</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tech-stack">
+            <h2 class="tech-title">技术栈</h2>
+            <div class="tech-tags">
+                <span class="tech-tag">HTML5</span>
+                <span class="tech-tag">CSS3</span>
+                <span class="tech-tag">JavaScript</span>
+                <span class="tech-tag">响应式设计</span>
+                <span class="tech-tag">移动端优化</span>
+                <span class="tech-tag">用户体验设计</span>
+                <span class="tech-tag">交互设计</span>
+                <span class="tech-tag">原型设计</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const showcases = document.querySelectorAll('.screen-showcase');
+            showcases.forEach((showcase, index) => {
+                showcase.style.opacity = '0';
+                showcase.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    showcase.style.transition = 'all 0.6s ease';
+                    showcase.style.opacity = '1';
+                    showcase.style.transform = 'translateY(0)';
+                }, index * 150);
+            });
+        });
+
+        // 悬停效果
+        document.querySelectorAll('.screen-showcase').forEach(showcase => {
+            showcase.addEventListener('mouseenter', function() {
+                this.querySelector('.screen-frame').style.transform = 'scale(1.05)';
+                this.querySelector('.screen-frame').style.transition = 'transform 0.3s ease';
+            });
+            
+            showcase.addEventListener('mouseleave', function() {
+                this.querySelector('.screen-frame').style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

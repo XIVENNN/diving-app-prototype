@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>约潜伴 - 潜水小程序</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 375px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 80px;
+        }
+
+
+
+        /* 顶部导航 */
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 44px 20px 20px;
+            color: white;
+            position: relative;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .publish-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .publish-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 筛选区域 */
+        .filter-section {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .filter-tab {
+            padding: 8px 16px;
+            background: #f1f3f4;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .filter-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-option {
+            padding: 6px 12px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-option.selected {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            color: #1976d2;
+        }
+
+        /* 约伴列表 */
+        .buddy-list {
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        .buddy-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .buddy-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .buddy-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .buddy-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+
+        .buddy-info {
+            flex: 1;
+        }
+
+        .buddy-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .buddy-level {
+            font-size: 12px;
+            color: #666;
+            background: #e8f5e8;
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .buddy-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .buddy-content {
+            margin-bottom: 12px;
+        }
+
+        .buddy-title {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        .buddy-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .buddy-tags {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .buddy-tag {
+            background: #f0f8ff;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .buddy-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .buddy-location {
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .buddy-join {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .buddy-join:hover {
+            transform: scale(1.05);
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 375px;
+            width: 100%;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 20px;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #000;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            background: currentColor;
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+
+        /* 发布按钮 */
+        .fab {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(255, 107, 107, 0.4);
+            transition: all 0.3s ease;
+            z-index: 99;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .buddy-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .buddy-card:nth-child(2) { animation-delay: 0.1s; }
+        .buddy-card:nth-child(3) { animation-delay: 0.2s; }
+        .buddy-card:nth-child(4) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航 -->
+        <div class="header">
+            <div class="header-content">
+                <svg class="back-btn" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+                <div class="header-title">约潜伴</div>
+                <button class="publish-btn">发布</button>
+            </div>
+        </div>
+
+        <!-- 筛选区域 -->
+        <div class="filter-section">
+            <div class="filter-tabs">
+                <button class="filter-tab active">全部</button>
+                <button class="filter-tab">今日</button>
+                <button class="filter-tab">本周</button>
+                <button class="filter-tab">本月</button>
+            </div>
+            <div class="filter-options">
+                <div class="filter-option selected">全部地区</div>
+                <div class="filter-option">三亚</div>
+                <div class="filter-option">马尔代夫</div>
+                <div class="filter-option">巴厘岛</div>
+                <div class="filter-option">OW+</div>
+                <div class="filter-option">AOW+</div>
+            </div>
+        </div>
+
+        <!-- 约伴列表 -->
+        <div class="buddy-list">
+            <div class="buddy-card">
+                <div class="buddy-header">
+                    <div class="buddy-avatar">海</div>
+                    <div class="buddy-info">
+                        <div class="buddy-name">海洋探索者</div>
+                        <div class="buddy-level">AOW</div>
+                    </div>
+                    <div class="buddy-time">2小时前</div>
+                </div>
+                <div class="buddy-content">
+                    <div class="buddy-title">三亚蜈支洲岛约伴，明天出发</div>
+                    <div class="buddy-desc">计划明天早上8点出发，下午回来。需要AOW以上证书，有经验的潜友优先。费用AA制。</div>
+                </div>
+                <div class="buddy-tags">
+                    <div class="buddy-tag">船潜</div>
+                    <div class="buddy-tag">深潜</div>
+                    <div class="buddy-tag">拍照</div>
+                </div>
+                <div class="buddy-footer">
+                    <div class="buddy-location">
+                        <span>◉</span>
+                        <span>三亚·蜈支洲岛</span>
+                    </div>
+                    <button class="buddy-join">加入</button>
+                </div>
+            </div>
+
+            <div class="buddy-card">
+                <div class="buddy-header">
+                    <div class="buddy-avatar">潜</div>
+                    <div class="buddy-info">
+                        <div class="buddy-name">潜水小白</div>
+                        <div class="buddy-level">OW</div>
+                    </div>
+                    <div class="buddy-time">5小时前</div>
+                </div>
+                <div class="buddy-content">
+                    <div class="buddy-title">马尔代夫度假村潜水，寻找潜伴</div>
+                    <div class="buddy-desc">下周去马尔代夫度假，想找个潜伴一起潜水。我是新手，希望找个有经验的朋友带带。</div>
+                </div>
+                <div class="buddy-tags">
+                    <div class="buddy-tag">度假村</div>
+                    <div class="buddy-tag">新手友好</div>
+                    <div class="buddy-tag">浮潜</div>
+                </div>
+                <div class="buddy-footer">
+                    <div class="buddy-location">
+                        <span>◉</span>
+                        <span>马尔代夫</span>
+                    </div>
+                    <button class="buddy-join">加入</button>
+                </div>
+            </div>
+
+            <div class="buddy-card">
+                <div class="buddy-header">
+                    <div class="buddy-avatar">深</div>
+                    <div class="buddy-info">
+                        <div class="buddy-name">深海猎人</div>
+                        <div class="buddy-level">DM</div>
+                    </div>
+                    <div class="buddy-time">1天前</div>
+                </div>
+                <div class="buddy-content">
+                    <div class="buddy-title">巴厘岛沉船潜水，寻找技术潜水员</div>
+                    <div class="buddy-desc">计划探索巴厘岛著名的USAT Liberty沉船，需要有技术潜水经验的潜友。深度30米+。</div>
+                </div>
+                <div class="buddy-tags">
+                    <div class="buddy-tag">沉船</div>
+                    <div class="buddy-tag">技术潜水</div>
+                    <div class="buddy-tag">深潜</div>
+                </div>
+                <div class="buddy-footer">
+                    <div class="buddy-location">
+                        <span>◉</span>
+                        <span>巴厘岛·图兰奔</span>
+                    </div>
+                    <button class="buddy-join">加入</button>
+                </div>
+            </div>
+
+            <div class="buddy-card">
+                <div class="buddy-header">
+                    <div class="buddy-avatar">摄</div>
+                    <div class="buddy-info">
+                        <div class="buddy-name">水下摄影师</div>
+                        <div class="buddy-level">AOW</div>
+                    </div>
+                    <div class="buddy-time">2天前</div>
+                </div>
+                <div class="buddy-content">
+                    <div class="buddy-title">菲律宾薄荷岛微距摄影之旅</div>
+                    <div class="buddy-desc">专门拍摄海兔、比目鱼等微距生物，需要有耐心的潜友。会分享拍摄技巧。</div>
+                </div>
+                <div class="buddy-tags">
+                    <div class="buddy-tag">微距摄影</div>
+                    <div class="buddy-tag">生物观察</div>
+                    <div class="buddy-tag">教学</div>
+                </div>
+                <div class="buddy-footer">
+                    <div class="buddy-location">
+                        <span>◉</span>
+                        <span>菲律宾·薄荷岛</span>
+                    </div>
+                    <button class="buddy-join">加入</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 发布按钮 -->
+        <div class="fab">+</div></section>
+
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+            <a href="home_page.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z%22/></svg>')"></div>
+                <span>首页</span>
+            </a>
+            <a href="dive_buddy.html" class="nav-item active">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H16c-.8 0-1.54.37-2 1l-3 4v2h2l2.54-3.4L16.5 18H20z%22/></svg>')"></div>
+                <span>约潜伴</span>
+            </a>
+            <a href="dive_spots.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z%22/></svg>')"></div>
+                <span>潜水点</span>
+            </a>
+            <a href="equipment.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z%22/></svg>')"></div>
+                <span>装备</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z%22/></svg>')"></div>
+                <span>我的</span>
+            </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 筛选标签切换
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 筛选选项切换
+        document.querySelectorAll('.filter-option').forEach(option => {
+            option.addEventListener('click', function() {
+                this.classList.toggle('selected');
+            });
+        });
+
+        // 加入按钮点击
+        document.querySelectorAll('.buddy-join').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                this.textContent = '已申请';
+                this.style.background = '#28a745';
+                this.disabled = true;
+            });
+        });
+
+        // 卡片点击
+        document.querySelectorAll('.buddy-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // 这里可以跳转到详情页
+                console.log('查看约伴详情');
+            });
+        });
+
+        // 发布按钮
+        document.querySelector('.fab').addEventListener('click', function() {
+            // 这里可以跳转到发布页面
+            console.log('发布约伴信息');
+        });
+
+        // 返回按钮
+        document.querySelector('.back-btn').addEventListener('click', function() {
+            window.history.back();
+        });
+    </script>
+</body>
+</html>

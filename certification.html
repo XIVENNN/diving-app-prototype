@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考证进阶 - 潜水小程序</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 375px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 80px;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 44px 20px 20px;
+            color: white;
+            position: relative;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .back-btn {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .search-btn {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        /* 进度卡片 */
+        .progress-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .progress-title {
+            font-size: 14px;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .current-level {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .next-level {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        /* 分类标签 */
+        .category-tabs {
+            background: white;
+            padding: 16px 20px 0;
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+        }
+
+        .category-tab {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+
+        .category-tab.active {
+            background: #2a5298;
+            color: white;
+            border-color: #2a5298;
+            border-bottom-color: #1e3c72;
+        }
+
+        /* 证书列表 */
+        .cert-list {
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        .cert-section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cert-item {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .cert-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .cert-item.completed {
+            border-left: 4px solid #4CAF50;
+        }
+
+        .cert-item.in-progress {
+            border-left: 4px solid #FF9800;
+        }
+
+        .cert-item.available {
+            border-left: 4px solid #2196F3;
+        }
+
+        .cert-item.locked {
+            opacity: 0.6;
+            border-left: 4px solid #9E9E9E;
+        }
+
+        .cert-content {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cert-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .cert-icon.ow { background: #f5f5f5; color: #666; }
+        .cert-icon.aow { background: #e0e0e0; color: #666; }
+        .cert-icon.rescue { background: #d0d0d0; color: #666; }
+        .cert-icon.dm { background: #c0c0c0; color: #666; }
+        .cert-icon.instructor { background: #b0b0b0; color: #666; }
+        .cert-icon.specialty { background: #a0a0a0; color: #666; }
+
+        .cert-info {
+            flex: 1;
+        }
+
+        .cert-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .cert-desc {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .cert-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 11px;
+        }
+
+        .cert-duration {
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .cert-price {
+            color: #2a5298;
+            font-weight: 600;
+        }
+
+        .cert-difficulty {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+
+        .cert-status {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .cert-status.completed {
+            background: #E8F5E8;
+            color: #2E7D32;
+        }
+
+        .cert-status.in-progress {
+            background: #FFF3E0;
+            color: #F57C00;
+        }
+
+        .cert-status.available {
+            background: #E3F2FD;
+            color: #1976D2;
+        }
+
+        .cert-status.locked {
+            background: #F5F5F5;
+            color: #757575;
+        }
+
+        .cert-progress {
+            margin-top: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            height: 4px;
+            overflow: hidden;
+        }
+
+        .cert-progress-fill {
+            background: #333;
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* 推荐课程 */
+        .recommended-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0 20px 20px;
+            border-radius: 12px;
+            padding: 16px;
+            color: white;
+        }
+
+        .recommended-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .recommended-desc {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+
+        .recommended-course {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .recommended-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .recommended-info {
+            flex: 1;
+        }
+
+        .recommended-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .recommended-meta {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 375px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 20px;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #000;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            background: currentColor;
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cert-item {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .cert-item:nth-child(1) { animation-delay: 0.1s; }
+        .cert-item:nth-child(2) { animation-delay: 0.2s; }
+        .cert-item:nth-child(3) { animation-delay: 0.3s; }
+        .cert-item:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航 -->
+        <div class="header">
+            <div class="header-content">
+                <svg class="back-btn" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+                <div class="header-title">考证进阶</div>
+                <svg class="search-btn" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+            </div>
+            
+            <!-- 进度卡片 -->
+            <div class="progress-card">
+                <div class="progress-title">当前学习进度</div>
+                <div class="progress-info">
+                    <div class="current-level">救援潜水员 (Rescue Diver)</div>
+                    <div class="next-level">下一级: 潜水长</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 75%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分类标签 -->
+        <div class="category-tabs">
+            <div class="category-tab active">全部课程</div>
+            <div class="category-tab">基础证书</div>
+            <div class="category-tab">进阶证书</div>
+            <div class="category-tab">专长课程</div>
+            <div class="category-tab">教练课程</div>
+        </div>
+
+        <!-- 推荐课程 -->
+        <div class="recommended-section">
+            <div class="recommended-title">🎯 为你推荐</div>
+            <div class="recommended-desc">基于你的当前水平和学习目标</div>
+            <div class="recommended-course">
+                <div class="recommended-icon">👨‍🏫</div>
+                <div class="recommended-info">
+                    <div class="recommended-name">潜水长 (Divemaster)</div>
+                    <div class="recommended-meta">4-6周 · ¥8,800 · 专业级</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 证书列表 -->
+        <div class="cert-list">
+            <!-- 已完成证书 -->
+            <div class="cert-section">
+                <div class="section-title">
+                    ✅ 已获得证书
+                </div>
+                
+                <div class="cert-item completed">
+                    <div class="cert-status completed">已完成</div>
+                    <div class="cert-content">
+                        <div class="cert-icon ow">◈</div>
+                        <div class="cert-info">
+                            <div class="cert-name">开放水域潜水员 (OW)</div>
+                            <div class="cert-desc">基础潜水技能，最大深度18米</div>
+                            <div class="cert-meta">
+                                <div class="cert-duration">
+                                    <span>◷</span>
+                                    <span>3-4天</span>
+                                </div>
+                                <div class="cert-difficulty">入门级</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cert-item completed">
+                    <div class="cert-status completed">已完成</div>
+                    <div class="cert-content">
+                        <div class="cert-icon aow">🌊</div>
+                        <div class="cert-info">
+                            <div class="cert-name">高级开放水域潜水员 (AOW)</div>
+                            <div class="cert-desc">进阶技能训练，最大深度30米</div>
+                            <div class="cert-meta">
+                                <div class="cert-duration">
+                                    <span>◷</span>
+                                    <span>2-3天</span>
+                                </div>
+                                <div class="cert-difficulty">进阶级</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cert-item in-progress">
+                    <div class="cert-status in-progress">进行中</div>
+                    <div class="cert-content">
+                        <div class="cert-icon rescue">◈</div>
+                        <div class="cert-info">
+                            <div class="cert-name">救援潜水员 (Rescue Diver)</div>
+                            <div class="cert-desc">学习救援技能和紧急处理</div>
+                            <div class="cert-meta">
+                                <div class="cert-duration">
+                                    <span>◷</span>
+                                    <span>3-4天</span>
+                                </div>
+                                <div class="cert-price">¥4,200</div>
+                                <div class="cert-difficulty">高级</div>
+                            </div>
+                            <div class="cert-progress">
+                                <div class="cert-progress-fill" style="width: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 可学习证书 -->
+            <div class="cert-section">
+                <div class="section-title">
+                    ◈ 可学习课程
+                </div>
+                
+                <div class="cert-item available">
+                    <div class="cert-status available">可报名</div>
+                    <div class="cert-content">
+                        <div class="cert-icon dm">◈</div>
+                        <div class="cert-info">
+                            <div class="cert-name">潜水长 (Divemaster)</div>
+                            <div class="cert-desc">专业级潜水员，可协助教学</div>
+                            <div class="cert-meta">
+                                <div class="cert-duration">
+                                    <span>◷</span>
+                                    <span>4-6周</span>
+                                </div>
+                                <div class="cert-price">¥8,800</div>
+                                <div class="cert-difficulty">专业级</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cert-item available">
+                    <div class="cert-status available">可报名</div>
+                    <div class="cert-content">
+                        <div class="cert-icon specialty">◈</div>
+                        <div class="cert-info">
+                            <div class="cert-name">深潜专长 (Deep Diving)</div>
+                            <div class="cert-desc">学习深潜技巧，最大深度40米</div>
+                            <div class="cert-meta">
+                                <div class="cert-duration">
+                                    <span>◷</span>
+                                    <span>2天</span>
+                                </div>
+                                <div class="cert-price">¥2,800</div>
+                                <div class="cert-difficulty">专长</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cert-item available">
+                    <div class="cert-status available">可报名</div>
+                    <div class="cert-content">
+                        <div class="cert-icon specialty">◈</div>
+                        <div class="cert-info">
+                            <div class="cert-name">夜潜专长 (Night Diving)</div>
+                            <div class="cert-desc">夜间潜水技能和安全知识</div>
+                            <div class="cert-meta">
+                                <div class="cert-duration">
+                                    <span>◷</span>
+                                    <span>2天</span>
+                                </div>
+                                <div class="cert-price">¥2,600</div>
+                                <div class="cert-difficulty">专长</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cert-item available">
+                    <div class="cert-status available">可报名</div>
+                    <div class="cert-content">
+                        <div class="cert-icon specialty">◈</div>
+                        <div class="cert-info">
+                            <div class="cert-name">水下摄影专长</div>
+                            <div class="cert-desc">学习水下摄影技巧和设备使用</div>
+                            <div class="cert-meta">
+                                <div class="cert-duration">
+                                    <span>⏱️</span>
+                                    <span>2天</span>
+                                </div>
+                                <div class="cert-price">¥3,200</div>
+                                <div class="cert-difficulty">专长</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 暂不可学 -->
+            <div class="cert-section">
+                <div class="section-title">
+                    ◈ 暂不可学
+                </div>
+                
+                <div class="cert-item locked">
+                    <div class="cert-status locked">需前置</div>
+                    <div class="cert-content">
+                        <div class="cert-icon instructor">◈</div>
+                        <div class="cert-info">
+                            <div class="cert-name">开放水域潜水教练 (OWSI)</div>
+                            <div class="cert-desc">需要完成潜水长课程</div>
+                            <div class="cert-meta">
+                                <div class="cert-duration">
+                                    <span>◷</span>
+                                    <span>2-3个月</span>
+                                </div>
+                                <div class="cert-price">¥18,000</div>
+                                <div class="cert-difficulty">教练级</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <a href="home_page.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z%22/></svg>')"></div>
+                <span>首页</span>
+            </a>
+            <a href="dive_buddy.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H16c-.8 0-1.54.37-2 1l-3 4v2h2l2.54-3.4L16.5 18H20z%22/></svg>')"></div>
+                <span>约潜伴</span>
+            </a>
+            <a href="dive_spots.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z%22/></svg>')"></div>
+                <span>潜水点</span>
+            </a>
+            <a href="equipment.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z%22/></svg>')"></div>
+                <span>装备</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z%22/></svg>')"></div>
+                <span>我的</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 分类标签切换
+        document.querySelectorAll('.category-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                const category = this.textContent;
+                console.log('切换分类:', category);
+                // 这里可以实现分类筛选逻辑
+            });
+        });
+
+        // 证书项点击
+        document.querySelectorAll('.cert-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const certName = this.querySelector('.cert-name').textContent;
+                const status = this.querySelector('.cert-status').textContent;
+                
+                console.log('查看证书:', certName, '状态:', status);
+                
+                if (status === '已完成') {
+                    // 跳转到证书详情页
+                } else if (status === '进行中') {
+                    // 跳转到学习进度页
+                } else if (status === '可报名') {
+                    // 跳转到课程详情和报名页
+                } else if (status === '需前置') {
+                    // 显示前置条件说明
+                }
+            });
+        });
+
+        // 推荐课程点击
+        document.querySelector('.recommended-course').addEventListener('click', function() {
+            const courseName = this.querySelector('.recommended-name').textContent;
+            console.log('查看推荐课程:', courseName);
+            // 这里可以跳转到课程详情页
+        });
+
+        // 搜索按钮
+        document.querySelector('.search-btn').addEventListener('click', function() {
+            console.log('打开搜索');
+            // 这里可以打开搜索功能
+        });
+
+        // 返回按钮
+        document.querySelector('.back-btn').addEventListener('click', function() {
+            console.log('返回上一页');
+            window.history.back();
+        });
+
+        // 进度条动画
+        function animateProgress() {
+            const progressFills = document.querySelectorAll('.progress-fill, .cert-progress-fill');
+            progressFills.forEach(fill => {
+                const width = fill.style.width;
+                fill.style.width = '0%';
+                setTimeout(() => {
+                    fill.style.width = width;
+                }, 100);
+            });
+        }
+
+        // 页面加载时启动动画
+        window.addEventListener('load', animateProgress);
+    </script>
+</body>
+</html>

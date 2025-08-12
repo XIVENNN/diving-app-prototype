@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>潜水小程序 - 首页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 375px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 80px;
+        }
+
+        /* 顶部导航栏 */
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 44px 20px 20px;
+            color: white;
+            position: relative;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        /* 搜索栏 */
+        .search-bar {
+            margin: 15px 20px 0;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 40px 12px 16px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.9);
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8E8E93;
+        }
+
+        /* 轮播横幅 */
+        .banner {
+            margin: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .banner-slide {
+            height: 160px;
+            background: linear-gradient(45deg, #4FACFE 0%, #00F2FE 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            position: relative;
+        }
+
+        .banner-content {
+            text-align: center;
+            z-index: 2;
+        }
+
+        .banner-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .banner-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* 快捷功能区 */
+        .quick-actions {
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1D1D1F;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #f0f0f0;
+        }
+
+        .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #333;
+            background: transparent;
+        }
+
+        .action-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1D1D1F;
+        }
+
+        /* 推荐内容区 */
+        .recommendations {
+            padding: 0 20px;
+            margin-bottom: 100px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+        }
+
+        .content-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .card-image {
+            height: 120px;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(255,255,255,0.9);
+            color: #007AFF;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .card-content {
+            padding: 16px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1D1D1F;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #8E8E93;
+        }
+
+        .card-location {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .card-time {
+            font-size: 12px;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 375px;
+            width: 100%;
+            background: white;
+            border-top: 1px solid #f0f0f0;
+            padding: 8px 0 20px;
+            display: flex;
+            justify-content: space-around;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 12px;
+            padding: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #000;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            background: currentColor;
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+
+        .nav-label {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 375px) {
+            .container {
+                max-width: 100%;
+            }
+            
+            .bottom-nav {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航栏 -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">深蓝潜水</h1>
+                <div class="user-avatar">◐</div>
+            </div>
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="搜索潜水点、装备、约伴...">
+                <span class="search-icon">⌕</span>
+            </div>
+        </header>
+
+        <!-- 轮播横幅 -->
+        <section class="banner fade-in">
+            <div class="banner-slide">
+                <div class="banner-content">
+                    <h2 class="banner-title">马尔代夫潜水之旅</h2>
+                    <p class="banner-subtitle">探索印度洋的蓝色秘境</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 快捷功能区 -->
+        <section class="quick-actions fade-in">
+            <h2 class="section-title">快捷功能</h2>
+            <div class="actions-grid">
+                <div class="action-card" onclick="navigateTo('buddy')">
+                    <div class="action-icon buddy">⚭</div>
+                    <div class="action-title">约潜伴</div>
+                </div>
+                <div class="action-card" onclick="navigateTo('spots')">
+                    <div class="action-icon spots">◉</div>
+                    <div class="action-title">潜水点</div>
+                </div>
+                <div class="action-card" onclick="navigateTo('equipment')">
+                    <div class="action-icon equipment">⚙</div>
+                    <div class="action-title">装备推荐</div>
+                </div>
+                <div class="action-card" onclick="navigateTo('knowledge')">
+                    <div class="action-icon knowledge">◈</div>
+                    <div class="action-title">知识库</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 推荐内容区 -->
+        <section class="recommendations fade-in">
+            <h2 class="section-title">最新推荐</h2>
+            
+            <div class="content-card">
+                <div class="card-image">
+                    <span class="card-badge">约伴</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">三亚蜈支洲岛潜水约伴</h3>
+                    <div class="card-meta">
+                        <span class="card-location">◉ 海南三亚</span>
+                        <span class="card-time">2小时前</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <div class="card-image" style="background: linear-gradient(45deg, #43cea2 0%, #185a9d 100%);">
+                    <span class="card-badge">潜点</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">巴厘岛图兰奔沉船潜水点</h3>
+                    <div class="card-meta">
+                        <span class="card-location">◉ 印尼巴厘岛</span>
+                        <span class="card-time">5小时前</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <div class="card-image" style="background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);">
+                    <span class="card-badge">装备</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">新手潜水装备选购指南</h3>
+                    <div class="card-meta">
+                        <span class="card-location">◉ 装备推荐</span>
+                        <span class="card-time">1天前</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+            <a href="home_page.html" class="nav-item active">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z%22/></svg>')"></div>
+                <span>首页</span>
+            </a>
+            <a href="dive_buddy.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H16c-.8 0-1.54.37-2 1l-3 4v2h2l2.54-3.4L16.5 18H20z%22/></svg>')"></div>
+                <span>约潜伴</span>
+            </a>
+            <a href="dive_spots.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z%22/></svg>')"></div>
+                <span>潜水点</span>
+            </a>
+            <a href="equipment.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z%22/></svg>')"></div>
+                <span>装备</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z%22/></svg>')"></div>
+                <span>我的</span>
+            </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                }, index * 200);
+            });
+        });
+
+        // 导航功能
+        function navigateTo(page) {
+            // 添加点击反馈
+            event.target.closest('.action-card').style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                event.target.closest('.action-card').style.transform = 'scale(1)';
+                // 实际页面跳转
+                const pageUrls = {
+                    'buddy': 'dive_buddy.html',
+                    'spots': 'dive_spots.html',
+                    'equipment': 'knowledge.html',
+                    'knowledge': 'knowledge.html'
+                };
+                if (pageUrls[page]) {
+                    window.location.href = pageUrls[page];
+                }
+            }, 150);
+        }
+
+        // 底部导航点击效果
+        document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                // 添加点击反馈
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+
+        function getPageName(page) {
+            const names = {
+                'buddy': '约潜伴',
+                'spots': '潜水点',
+                'equipment': '装备推荐',
+                'knowledge': '知识库'
+            };
+            return names[page] || page;
+        }
+
+        // 底部导航切换
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 搜索功能
+        document.querySelector('.search-input').addEventListener('focus', function() {
+            this.style.background = 'white';
+            this.style.boxShadow = '0 2px 8px rgba(0,122,255,0.2)';
+        });
+
+        document.querySelector('.search-input').addEventListener('blur', function() {
+            this.style.background = 'rgba(255,255,255,0.9)';
+            this.style.boxShadow = 'none';
+        });
+
+        // 卡片点击效果
+        document.querySelectorAll('.content-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+    </script>
+    </div>
+</body>
+</html>

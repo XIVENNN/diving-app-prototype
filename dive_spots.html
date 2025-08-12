@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>潜水点 - 潜水小程序</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 375px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            min-height: 100vh;
+            position: relative;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 44px 20px 20px;
+            color: white;
+            position: relative;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .back-btn {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .search-btn {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 10px 16px;
+            color: white;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .search-bar::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 分类标签 */
+        .category-tabs {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+        }
+
+        .category-tab {
+            padding: 8px 16px;
+            background: #f1f3f4;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            white-space: nowrap;
+        }
+
+        .category-tab.active {
+            background: #333;
+            color: white;
+        }
+
+        /* 地图区域 */
+        .map-section {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .map-container {
+            height: 200px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #666;
+        }
+
+        .map-pins {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .map-pin {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ff4757;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            cursor: pointer;
+            animation: bounce 2s infinite;
+        }
+
+        .map-pin::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 14px;
+            height: 14px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .pin-1 { top: 30%; left: 20%; animation-delay: 0s; }
+        .pin-2 { top: 60%; left: 70%; animation-delay: 0.5s; }
+        .pin-3 { top: 40%; left: 50%; animation-delay: 1s; }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: rotate(-45deg) translateY(0); }
+            40% { transform: rotate(-45deg) translateY(-10px); }
+            60% { transform: rotate(-45deg) translateY(-5px); }
+        }
+
+        /* 潜水点列表 */
+        .spots-list {
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        .spot-card {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .spot-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .spot-image {
+            height: 160px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spot-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.3)"/><circle cx="80" cy="30" r="1.5" fill="rgba(255,255,255,0.2)"/><circle cx="60" cy="70" r="1" fill="rgba(255,255,255,0.4)"/><circle cx="30" cy="80" r="1.2" fill="rgba(255,255,255,0.3)"/></svg>') repeat;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .spot-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .spot-rating {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .spot-content {
+            padding: 16px;
+        }
+
+        .spot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .spot-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .spot-location {
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .spot-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ff4757;
+        }
+
+        .spot-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .spot-features {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .spot-feature {
+            background: #f0f8ff;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .spot-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .spot-info {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .spot-book {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .spot-book:hover {
+            transform: scale(1.05);
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 375px;
+            width: 100%;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 20px;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #000;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            background: currentColor;
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .spot-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .spot-card:nth-child(2) { animation-delay: 0.1s; }
+        .spot-card:nth-child(3) { animation-delay: 0.2s; }
+        .spot-card:nth-child(4) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航 -->
+        <div class="header">
+            <div class="header-content">
+                <svg class="back-btn" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+                <div class="header-title">潜水点</div>
+                <svg class="search-btn" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+            </div>
+            <input type="text" class="search-bar" placeholder="搜索潜水点或潜店...">
+        </div>
+
+        <!-- 分类标签 -->
+        <div class="category-tabs">
+            <button class="category-tab active">全部</button>
+            <button class="category-tab">热门推荐</button>
+            <button class="category-tab">国内</button>
+            <button class="category-tab">国外</button>
+            <button class="category-tab">度假村</button>
+            <button class="category-tab">沉船</button>
+        </div>
+
+        <!-- 地图区域 -->
+        <div class="map-section">
+            <div class="map-container">
+                <div class="map-placeholder">
+                    <div style="font-size: 14px; margin-bottom: 8px;">◉ 潜水点分布图</div>
+                    <div style="font-size: 12px;">点击地图标记查看详情</div>
+                </div>
+                <div class="map-pins">
+                    <div class="map-pin pin-1"></div>
+                    <div class="map-pin pin-2"></div>
+                    <div class="map-pin pin-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 潜水点列表 -->
+        <div class="spots-list">
+            <div class="spot-card">
+                <div class="spot-image">
+                    <div class="spot-badge">热门</div>
+                    <div class="spot-rating">
+                        <span>⭐</span>
+                        <span>4.8</span>
+                    </div>
+                </div>
+                <div class="spot-content">
+                    <div class="spot-header">
+                        <div>
+                            <div class="spot-name">三亚蜈支洲岛</div>
+                            <div class="spot-location">
+                                <span>◉</span>
+                                <span>海南·三亚</span>
+                            </div>
+                        </div>
+                        <div class="spot-price">¥280</div>
+                    </div>
+                    <div class="spot-desc">中国最美的潜水胜地之一，水质清澈，海洋生物丰富，适合各个级别的潜水员。</div>
+                    <div class="spot-features">
+                        <div class="spot-feature">珊瑚礁</div>
+                        <div class="spot-feature">热带鱼</div>
+                        <div class="spot-feature">能见度高</div>
+                        <div class="spot-feature">新手友好</div>
+                    </div>
+                    <div class="spot-footer">
+                        <div class="spot-info">
+                            <span>深度: 5-25m</span>
+                            <span>能见度: 15-30m</span>
+                        </div>
+                        <button class="spot-book">预订</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spot-card">
+                <div class="spot-image">
+                    <div class="spot-badge">推荐</div>
+                    <div class="spot-rating">
+                        <span>⭐</span>
+                        <span>4.9</span>
+                    </div>
+                </div>
+                <div class="spot-content">
+                    <div class="spot-header">
+                        <div>
+                            <div class="spot-name">马尔代夫班多士岛</div>
+                            <div class="spot-location">
+                                <span>◉</span>
+                                <span>马尔代夫</span>
+                            </div>
+                        </div>
+                        <div class="spot-price">¥1580</div>
+                    </div>
+                    <div class="spot-desc">世界顶级潜水目的地，拥有丰富的海洋生物和绝美的珊瑚礁，是潜水爱好者的天堂。</div>
+                    <div class="spot-features">
+                        <div class="spot-feature">鲸鲨</div>
+                        <div class="spot-feature">魔鬼鱼</div>
+                        <div class="spot-feature">珊瑚花园</div>
+                        <div class="spot-feature">度假村</div>
+                    </div>
+                    <div class="spot-footer">
+                        <div class="spot-info">
+                            <span>深度: 10-40m</span>
+                            <span>能见度: 25-40m</span>
+                        </div>
+                        <button class="spot-book">预订</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spot-card">
+                <div class="spot-image">
+                    <div class="spot-badge">沉船</div>
+                    <div class="spot-rating">
+                        <span>⭐</span>
+                        <span>4.7</span>
+                    </div>
+                </div>
+                <div class="spot-content">
+                    <div class="spot-header">
+                        <div>
+                            <div class="spot-name">巴厘岛USAT Liberty</div>
+                            <div class="spot-location">
+                                <span>◉</span>
+                                <span>印尼·巴厘岛</span>
+                            </div>
+                        </div>
+                        <div class="spot-price">¥420</div>
+                    </div>
+                    <div class="spot-desc">著名的沉船潜水点，二战时期的美军运输舰，现已成为海洋生物的栖息地。</div>
+                    <div class="spot-features">
+                        <div class="spot-feature">沉船探索</div>
+                        <div class="spot-feature">历史遗迹</div>
+                        <div class="spot-feature">大型鱼类</div>
+                        <div class="spot-feature">技术潜水</div>
+                    </div>
+                    <div class="spot-footer">
+                        <div class="spot-info">
+                            <span>深度: 5-30m</span>
+                            <span>能见度: 15-25m</span>
+                        </div>
+                        <button class="spot-book">预订</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="spot-card">
+                <div class="spot-image">
+                    <div class="spot-badge">微距</div>
+                    <div class="spot-rating">
+                        <span>⭐</span>
+                        <span>4.6</span>
+                    </div>
+                </div>
+                <div class="spot-content">
+                    <div class="spot-header">
+                        <div>
+                            <div class="spot-name">菲律宾薄荷岛</div>
+                            <div class="spot-location">
+                                <span>◉</span>
+                                <span>菲律宾</span>
+                            </div>
+                        </div>
+                        <div class="spot-price">¥380</div>
+                    </div>
+                    <div class="spot-desc">微距摄影的天堂，拥有丰富的小型海洋生物，是水下摄影师的最爱。</div>
+                    <div class="spot-features">
+                        <div class="spot-feature">海兔</div>
+                        <div class="spot-feature">比目鱼</div>
+                        <div class="spot-feature">微距摄影</div>
+                        <div class="spot-feature">生物多样</div>
+                    </div>
+                    <div class="spot-footer">
+                        <div class="spot-info">
+                            <span>深度: 3-20m</span>
+                            <span>能见度: 10-20m</span>
+                        </div>
+                        <button class="spot-book">预订</button>
+                    </div>
+                </div>
+            </div>
+        </div></section>
+
+            <!-- 底部导航 -->
+            <div class="bottom-nav">
+            <a href="home_page.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z%22/></svg>')"></div>
+                <span>首页</span>
+            </a>
+            <a href="dive_buddy.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 7H16c-.8 0-1.54.37-2 1l-3 4v6h2v7h3v-7h4z%22/></svg>')"></div>
+                <span>潜伴</span>
+            </a>
+            <a href="dive_spots.html" class="nav-item active">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z%22/></svg>')"></div>
+                <span>潜水点</span>
+            </a>
+            <a href="equipment.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z%22/></svg>')"></div>
+                <span>装备</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <div class="nav-icon" style="mask-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z%22/></svg>')"></div>
+                <span>我的</span>
+            </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 分类标签切换
+        document.querySelectorAll('.category-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 地图标记点击
+        document.querySelectorAll('.map-pin').forEach(pin => {
+            pin.addEventListener('click', function() {
+                // 这里可以显示对应潜水点的详情
+                console.log('查看地图标记详情');
+            });
+        });
+
+        // 预订按钮点击
+        document.querySelectorAll('.spot-book').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                this.textContent = '已预订';
+                this.style.background = '#28a745';
+                this.disabled = true;
+            });
+        });
+
+        // 卡片点击
+        document.querySelectorAll('.spot-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // 这里可以跳转到潜水点详情页
+                console.log('查看潜水点详情');
+            });
+        });
+
+        // 搜索功能
+        document.querySelector('.search-bar').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            // 这里可以实现搜索过滤功能
+            console.log('搜索:', searchTerm);
+        });
+
+        // 返回按钮
+        document.querySelector('.back-btn').addEventListener('click', function() {
+            window.history.back();
+        });
+    </script>
+</body>
+</html>
